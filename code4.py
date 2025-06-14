@@ -57,26 +57,41 @@ def add_item(grocery_list):
         #Ends function early
         return
 
+    #Sets maximum quantity per user per item
+    max_per_user = 50
+    #Gets current quantity of item in the user's cart
+    current_quantity = grocery_list.get(item, 0)
+    #If user enters a quantity beyond the limit of user's limit
+    if current_quantity >= max_per_user:
+        msgbox(f"You already have the maximum allowed of 50 x '{item}' in your cart.")
+        #Ends function early
+        return
+
     #Enterbox to ask user quantity they would like to purchase
-    quantity_input = enterbox(f"How many '{item}' would you like to buy?", "Enter Quantity")
+    quantity_input = enterbox(f"How many '{item}' would you like to buy? (Max: {max_per_user - current_quantity})", "Enter Quantity")
     #If user decides to cancel program
     if quantity_input is None:
         msgbox("Action has been cancelled.")
         #Ends function early
         return
 
-    #Validates user's input by checking if it is a positive whole number above 0
-    if quantity_input.isdigit() and int(quantity_input) > 0:
-        #Converts string into integer
+    #Validates user's input by checking if it is a positive whole number above 0 and does not exceed max_per_user
+    if quantity_input.isdigit():
+        #Converts string to integer
         quantity = int(quantity_input)
-        if item in grocery_list:
-            #If item is in list, increases its quantity
-            grocery_list[item] += quantity
+        #Checks input does not exceed maximum amount allowed
+        if 0 < quantity <= (max_per_user - current_quantity):
+            if item in grocery_list:
+                #If item is in list, increases its quantity
+                grocery_list[item] += quantity
+            else:
+                #If item is not in list, adds it with the quantity
+                grocery_list[item] = quantity
+            #Message box to inform user that item has been added to cart
+            msgbox(f"{quantity} x '{item}' has been added to your list.")
         else:
-            #If item is not in list, adds it with the quantity
-            grocery_list[item] = quantity
-        #Message box to inform user that item has been added to cart
-        msgbox(f"{quantity} x '{item}' has been added to your list.")
+            #Message to inform user that quantity exceeds the allowed amount
+            msgbox(f"Please enter a whole number between 1 and {max_per_user - current_quantity}.")
     else:
         #Message to inform user their input is invalid
         msgbox("Please enter a whole number greater than 0.")
@@ -89,7 +104,9 @@ def view_items(grocery_list):
         #Item numbering starts from 1
         count = 1
         message = "Your grocery list:\n\n"
+        #Empty list to store names of items
         items = []
+        #Empty list to store quantites of items
         quantities = []
         #Calculates cart cost by multiplying item amount with cost
         for item in grocery_list:
